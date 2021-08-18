@@ -4,10 +4,10 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.world.ISeedReader;
+import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.WorldGenRegion;
@@ -21,7 +21,10 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ObjectHolder;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class WastifyFeature extends Feature<NoFeatureConfig> {
 
@@ -70,13 +73,21 @@ public class WastifyFeature extends Feature<NoFeatureConfig> {
     @Override
     public boolean place(ISeedReader reader, ChunkGenerator chunkGenerator, Random random, BlockPos pos, NoFeatureConfig config) {
         initBlockReplacements();
+        if (blockReplacements.isEmpty()) {
+            return true;
+        }
         WorldGenRegion region = (WorldGenRegion) reader;
         for (int cx = -1 ; cx < 2 ; cx++) {
             for (int cz = -1 ; cz < 2 ; cz++) {
                 int chunkX = region.getCenterX()+cx;
                 int chunkZ = region.getCenterZ()+cz;
-                ChunkPos cp = new ChunkPos(chunkX, chunkZ);
                 IChunk chunk = region.getChunk(chunkX, chunkZ);
+
+                ChunkStatus status = chunk.getStatus();
+                if (!status.isOrAfter(ChunkStatus.FEATURES)) {
+                    continue;
+                }
+
                 BlockPos.Mutable mpos = new BlockPos.Mutable();
                 for (int y = 0; y < reader.getHeight(); y++) {
                     for (int x = 0; x < 16; x++) {

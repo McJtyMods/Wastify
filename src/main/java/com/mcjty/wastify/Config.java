@@ -25,7 +25,7 @@ public class Config {
                 .comment("This is a list of <oldbiome>=<newbiome> that will be used to map biomes")
                 .defineList("biomeReplacements", Lists.newArrayList(), s -> s instanceof String);
         BLOCK_REPLACEMENTS = COMMON_BUILDER
-                .comment("This is a list of <oldblock>=<newblock> that will be used to map blocks")
+                .comment("This is a list of <oldblock>=<newblock> that will be used to map blocks. Warning! Using this severely degrades worldgen performance!")
                 .defineList("blockReplacements", Lists.newArrayList(), s -> s instanceof String);
 
         COMMON_BUILDER.pop();
