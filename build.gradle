@@ -23,7 +23,6 @@ repositories {
     }
 }
 
-version = '1.0'
 group = 'com.mcjty.wastify' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'wastify'
 
