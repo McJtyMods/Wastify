@@ -9,5 +9,6 @@
     "seed": 0,
     "settings": "minecraft:overworld",
     "type": "minecraft:noise"
-  }
+  },
+  "forge:use_server_seed": true
 }

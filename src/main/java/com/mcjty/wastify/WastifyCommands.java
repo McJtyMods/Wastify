@@ -1,26 +1,25 @@
 package com.mcjty.wastify;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.builder.ArgumentBuilder;
-import net.minecraft.block.Block;
-import net.minecraft.command.CommandSource;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.WorldGenRegistries;
-import net.minecraft.world.biome.Biome;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Map;
 
 public class WastifyCommands {
 
-    public static ArgumentBuilder<CommandSource, ?> registerListBiomes(CommandDispatcher<CommandSource> dispatcher) {
-        return net.minecraft.command.Commands.literal("listbiomes")
+    public static LiteralArgumentBuilder<CommandSourceStack> registerListBiomes(CommandDispatcher<CommandSourceStack> dispatcher) {
+        return Commands.literal("listbiomes")
                 .requires(cs -> cs.hasPermission(2))
                 .executes(context -> {
-                    Registry<Biome> biomeRegistry = WorldGenRegistries.BIOME;
-                    for (Map.Entry<RegistryKey<Biome>, Biome> entry : biomeRegistry.entrySet()) {
+                    for (Map.Entry<ResourceKey<Biome>, Biome> entry : BuiltinRegistries.BIOME.entrySet()) {
                         ResourceLocation id = entry.getKey().location();
                         System.out.println(id);
                     }
@@ -28,11 +27,11 @@ public class WastifyCommands {
                 });
     }
 
-    public static ArgumentBuilder<CommandSource, ?> registerListBlocks(CommandDispatcher<CommandSource> dispatcher) {
-        return net.minecraft.command.Commands.literal("listblocks")
+    public static LiteralArgumentBuilder<CommandSourceStack> registerListBlocks(CommandDispatcher<CommandSourceStack> dispatcher) {
+        return Commands.literal("listblocks")
                 .requires(cs -> cs.hasPermission(2))
                 .executes(context -> {
-                    for (Map.Entry<RegistryKey<Block>, Block> entry : ForgeRegistries.BLOCKS.getEntries()) {
+                    for (Map.Entry<ResourceKey<Block>, Block> entry : ForgeRegistries.BLOCKS.getEntries()) {
                         ResourceLocation id = entry.getKey().location();
                         System.out.println(id);
                     }
