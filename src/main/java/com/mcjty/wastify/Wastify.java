@@ -10,6 +10,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
@@ -31,6 +32,7 @@ public class Wastify {
 
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         BIOMESOURCE_REGISTRY.register(bus);
+        bus.addListener(this::onSetup);
 
         MinecraftForge.EVENT_BUS.addListener(this::registerCommands);
     }
@@ -40,6 +42,10 @@ public class Wastify {
         dispatcher.register(
                 Commands.literal(Wastify.MODID)
                         .then(WastifyCommands.registerListBiomes(dispatcher)));
+    }
+
+    public void onSetup(FMLCommonSetupEvent event) {
+        LostCityCompat.register();
     }
 
 }

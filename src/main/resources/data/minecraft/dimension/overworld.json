@@ -3,10 +3,12 @@
   "generator": {
     "biome_source": {
       "type": "wastify:wastify_biomes",
+      "dimension": "minecraft:overworld",
       "adapt_biome_source": {
         "type": "minecraft:multi_noise",
         "preset": "minecraft:overworld"
       },
+      "sphere_default": "minecraft:jungle",
       "default": "minecraft:desert",
       "mapping": [
         "minecraft:badlands=minecraft:badlands",

@@ -7,15 +7,17 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Climate;
-import org.apache.commons.lang3.StringUtils;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 import javax.annotation.Nonnull;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public class WastifyBiomeSource extends BiomeSource {
@@ -23,31 +25,33 @@ public class WastifyBiomeSource extends BiomeSource {
             instance -> instance
                     .group(
                             RegistryOps.retrieveRegistry(Registry.BIOME_REGISTRY).forGetter(provider -> provider.biomes),
+                            Codec.STRING.fieldOf("dimension").forGetter(provider -> provider.dimensionId),
                             BiomeSource.CODEC.fieldOf("adapt_biome_source").forGetter(provider -> provider.biomeSource),
-                            Codec.STRING.optionalFieldOf("default").forGetter(provider -> Optional.ofNullable(provider.defaultBiomeId)),
-                            Codec.list(Codec.STRING).fieldOf("mapping").forGetter(provider -> provider.biomeMappingList)
+                            Codec.STRING.optionalFieldOf("default").forGetter(provider -> Optional.ofNullable(provider.mapper.getDefaultBiomeId())),
+                            Codec.STRING.optionalFieldOf("sphere_default").forGetter(provider -> Optional.ofNullable(provider.sphereMapper.getDefaultBiomeId())),
+                            Codec.list(Codec.STRING).fieldOf("mapping").forGetter(provider -> provider.mapper.getBiomeMappingList()),
+                            Codec.list(Codec.STRING).optionalFieldOf("sphere_mapping").forGetter(provider -> Optional.ofNullable(provider.sphereMapper.getBiomeMappingList()))
                     )
                     .apply(instance, instance.stable(WastifyBiomeSource::new)));
 
+    private final String dimensionId;
     private final Registry<Biome> biomes;
     private final BiomeSource biomeSource;
-    private final List<String> biomeMappingList;
-    private final String defaultBiomeId;
-    private final Holder<Biome> defaultBiome;
-    private Map<Biome, Holder<Biome>> biomeMapping = null;
+    private final BiomeMapper mapper;
+    private final BiomeMapper sphereMapper;
+    private Level level;    // Only needed for Lost Cities
 
-    public WastifyBiomeSource(Registry<Biome> biomes, BiomeSource biomeSource, Optional<String> defaultBiome, List<String> biomeMappingList) {
+    public WastifyBiomeSource(Registry<Biome> biomes, String dimensionId, BiomeSource biomeSource,
+                              Optional<String> defaultBiome,
+                              Optional<String> defaultSphereBiome,
+                              List<String> biomeMappingList,
+                              Optional<List<String>> sphereBiomeMappingList) {
         super(biomeSource.possibleBiomes().stream());
+        this.dimensionId = dimensionId;
         this.biomes = biomes;
         this.biomeSource = biomeSource;
-        this.defaultBiomeId = defaultBiome.orElse(null);
-        if (defaultBiomeId == null) {
-            this.defaultBiome = null;
-        } else {
-            ResourceKey<Biome> key = ResourceKey.create(Registry.BIOME_REGISTRY, new ResourceLocation(defaultBiomeId));
-            this.defaultBiome = biomes.getHolderOrThrow(key);
-        }
-        this.biomeMappingList = biomeMappingList;
+        this.mapper = new BiomeMapper(biomes, defaultBiome, biomeMappingList);
+        this.sphereMapper = new BiomeMapper(biomes, defaultSphereBiome, sphereBiomeMappingList.orElse(Collections.emptyList()));
     }
 
     @Override
@@ -56,35 +60,20 @@ public class WastifyBiomeSource extends BiomeSource {
         return CODEC;
     }
 
-    private void initBiomeMapping() {
-        if (biomeMapping == null) {
-            biomeMapping = new HashMap<>();
-
-            for (String replacement : biomeMappingList) {
-                String[] split = StringUtils.split(replacement, '=');
-                Biome source = biomes.get(new ResourceLocation(split[0]));
-                if (source == null) {
-                    Wastify.LOGGER.warn("Biome '" + split[0] + "' is missing!");
-                } else {
-                    Biome dest = biomes.get(new ResourceLocation(split[1]));
-                    if (dest == null) {
-                        Wastify.LOGGER.warn("Biome '" + split[1] + "' is missing!");
-                    } else {
-                        Optional<ResourceKey<Biome>> key = biomes.getResourceKey(dest);
-                        key.ifPresent(h -> {
-                            biomeMapping.put(source, biomes.getHolderOrThrow(h));
-                        });
-                    }
-                }
+    @Override
+    @Nonnull
+    public Holder<Biome> getNoiseBiome(int x, int y, int z, Climate.Sampler sampler) {
+        Holder<Biome> biome = biomeSource.getNoiseBiome(x, y, z, sampler);
+        BiomeMapper m = mapper;
+        if (LostCityCompat.hasLostCities()) {
+            if (level == null) {
+                MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+                level = server.getLevel(ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(dimensionId)));
+            }
+            if (level != null && LostCityCompat.isInSphere(level, (x << 2) >> 4, (z << 2) >> 4)) {
+                m = sphereMapper;
             }
         }
-    }
-
-
-    @Override
-    public Holder<Biome> getNoiseBiome(int x, int y, int z, Climate.Sampler sampler) {
-        initBiomeMapping();
-        Holder<Biome> biome = biomeSource.getNoiseBiome(x, y, z, sampler);
-        return biomeMapping.getOrDefault(biome.get(), defaultBiome == null ? biome : defaultBiome);
+        return m.getMappedBiome(biome);
     }
 }
