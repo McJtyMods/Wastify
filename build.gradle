@@ -78,9 +78,13 @@ dependencies {
     // at runtime, use the full JEI jar for Forge
     runtimeOnly fg.deobf("mezz.jei:jei-1.19-forge:${jei_version}")
 
-    implementation fg.deobf(project.dependencies.create("mcjty.theoneprobe:theoneprobe:${top_version}") {
-        transitive = false
-    })
+    if (findProject(':TheOneProbe') != null) {
+        implementation project(':TheOneProbe')
+    } else {
+        implementation fg.deobf(project.dependencies.create("mcjty.theoneprobe:theoneprobe:${top_version}") {
+            transitive = false
+        })
+    }
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
