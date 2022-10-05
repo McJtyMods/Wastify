@@ -11,12 +11,12 @@ public class LostCityInternal {
 
     static ILostCities lostCities = null;
 
-    public static boolean isInSphere(Level level, int chunkX, int chunkZ) {
+    public static boolean isInSphere(Level level, int x, int z) {
         ILostCityInformation lostInfo = lostCities.getLostInfo(level);
         if (lostInfo == null) {
             return false;
         }
-        ILostSphere sphere = lostInfo.getSphere(chunkX, chunkZ);
+        ILostSphere sphere = lostInfo.getSphere(x, z);
         if (sphere == null) {
             return false;
         }

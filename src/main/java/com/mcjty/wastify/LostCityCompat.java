@@ -22,9 +22,9 @@ public class LostCityCompat {
         return hasLostCities;
     }
 
-    public static boolean isInSphere(Level level, int chunkX, int chunkZ) {
+    public static boolean isInSphere(Level level, int x, int z) {
         if (hasLostCities) {
-            return LostCityInternal.isInSphere(level, chunkX, chunkZ);
+            return LostCityInternal.isInSphere(level, x, z);
         }
         return false;
     }

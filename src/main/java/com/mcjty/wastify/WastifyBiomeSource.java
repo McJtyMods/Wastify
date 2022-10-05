@@ -70,7 +70,7 @@ public class WastifyBiomeSource extends BiomeSource {
                 MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
                 level = server.getLevel(ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(dimensionId)));
             }
-            if (level != null && LostCityCompat.isInSphere(level, (x << 2) >> 4, (z << 2) >> 4)) {
+            if (level != null && LostCityCompat.isInSphere(level, x << 2, z << 2)) {
                 m = sphereMapper;
             }
         }
