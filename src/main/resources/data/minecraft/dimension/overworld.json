@@ -1,6 +1,7 @@
 {
   "type": "minecraft:overworld",
   "generator": {
+    "seed": 0,
     "biome_source": {
       "type": "wastify:wastify_biomes",
       "dimension": "minecraft:overworld",
@@ -60,5 +61,6 @@
     },
     "settings": "minecraft:overworld",
     "type": "minecraft:noise"
-  }
+  },
+  "forge:use_server_seed": true
 }

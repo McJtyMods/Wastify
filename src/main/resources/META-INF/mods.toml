@@ -1,5 +1,5 @@
-modLoader="javafml" #mandatory
-loaderVersion="[43,)"
+modLoader="javafml"
+loaderVersion="[40,)"
 license="MIT License https://github.com/McJty/Wastify/blob/1.19/LICENCE"
 
 [[mods]]
@@ -13,12 +13,12 @@ Wastify will change biomes to your own desired mapping
 [[dependencies.wastify]]
     modId="forge"
     mandatory=true
-    versionRange="[43,)"
+    versionRange="[40,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.wastify]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.19,)"
+    versionRange="[1.18.2,)"
     ordering="NONE"
     side="BOTH"

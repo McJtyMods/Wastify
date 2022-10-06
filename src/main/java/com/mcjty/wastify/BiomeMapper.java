@@ -66,6 +66,6 @@ public class BiomeMapper {
 
     public Holder<Biome> getMappedBiome(Holder<Biome> biome) {
         initBiomeMapping();
-        return biomeMapping.getOrDefault(biome.get(), defaultBiome == null ? biome : defaultBiome);
+        return biomeMapping.getOrDefault(biome.value(), defaultBiome == null ? biome : defaultBiome);
     }
 }

@@ -8,7 +8,6 @@ import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
@@ -58,6 +57,13 @@ public class WastifyBiomeSource extends BiomeSource {
     @Nonnull
     protected Codec<? extends BiomeSource> codec() {
         return CODEC;
+    }
+
+    @Override
+    public BiomeSource withSeed(long pSeed) {
+        return new WastifyBiomeSource(biomes, dimensionId, biomeSource, Optional.ofNullable(mapper.getDefaultBiomeId()),
+                Optional.ofNullable(sphereMapper.getDefaultBiomeId()), mapper.getBiomeMappingList(),
+                sphereMapper.getBiomeMappingList().isEmpty() ? Optional.empty() : Optional.of(sphereMapper.getBiomeMappingList()));
     }
 
     @Override
