@@ -20,7 +20,12 @@ public class LostCityInternal {
         if (sphere == null) {
             return false;
         }
-        return sphere.isEnabled();
+        if (!sphere.isEnabled()) {
+            return false;
+        }
+        double sqdist = sphere.getCenterPos().distToCenterSqr(x, sphere.getCenterPos().getY(), z);
+        double dist = Math.sqrt(sqdist);
+        return dist < sphere.getRadius()-5; // Take some distance from the border
     }
 
     public static class GetLostCity implements Function<ILostCities, Void> {
