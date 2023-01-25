@@ -1,7 +1,8 @@
 package com.mcjty.wastify;
 
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
@@ -13,21 +14,21 @@ import java.util.Map;
 import java.util.Optional;
 
 public class BiomeMapper {
-    final Registry<Biome> biomes;
+    final HolderLookup.RegistryLookup<Biome> biomes;
     private final List<String> biomeMappingList;
     private final String defaultBiomeId;
     private final Holder<Biome> defaultBiome;
     private Map<Biome, Holder<Biome>> biomeMapping = null;
 
-    public BiomeMapper(Registry<Biome> biomes, Optional<String> defaultBiomeId, List<String> biomeMappingList) {
+    public BiomeMapper(HolderLookup.RegistryLookup<Biome> biomes, Optional<String> defaultBiomeId, List<String> biomeMappingList) {
         this.biomes = biomes;
         this.biomeMappingList = biomeMappingList;
         this.defaultBiomeId = defaultBiomeId.orElse(null);
         if (this.defaultBiomeId == null) {
             this.defaultBiome = null;
         } else {
-            ResourceKey<Biome> key = ResourceKey.create(Registry.BIOME_REGISTRY, new ResourceLocation(this.defaultBiomeId));
-            this.defaultBiome = biomes.getHolderOrThrow(key);
+            ResourceKey<Biome> key = ResourceKey.create(Registries.BIOME, new ResourceLocation(this.defaultBiomeId));
+            this.defaultBiome = biomes.getOrThrow(key);
         }
     }
 
@@ -45,17 +46,16 @@ public class BiomeMapper {
 
             for (String replacement : biomeMappingList) {
                 String[] split = StringUtils.split(replacement, '=');
-                Biome source = biomes.get(new ResourceLocation(split[0]));
-                if (source == null) {
+                Optional<Holder.Reference<Biome>> source = biomes.get(ResourceKey.create(Registries.BIOME, new ResourceLocation(split[0])));
+                if (!source.isPresent()) {
                     Wastify.LOGGER.warn("Biome '" + split[0] + "' is missing!");
                 } else {
-                    Biome dest = biomes.get(new ResourceLocation(split[1]));
-                    if (dest == null) {
+                    Optional<Holder.Reference<Biome>> dest = biomes.get(ResourceKey.create(Registries.BIOME, new ResourceLocation(split[1])));
+                    if (!dest.isPresent()) {
                         Wastify.LOGGER.warn("Biome '" + split[1] + "' is missing!");
                     } else {
-                        Optional<ResourceKey<Biome>> key = biomes.getResourceKey(dest);
-                        key.ifPresent(h -> {
-                            biomeMapping.put(source, biomes.getHolderOrThrow(h));
+                        dest.ifPresent(h -> {
+                            biomeMapping.put(source.get().get(), h);
                         });
                     }
                 }

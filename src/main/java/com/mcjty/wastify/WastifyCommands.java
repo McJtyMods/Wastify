@@ -4,7 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
@@ -17,7 +17,7 @@ public class WastifyCommands {
         return Commands.literal("listbiomes")
                 .requires(cs -> cs.hasPermission(2))
                 .executes(context -> {
-                    for (Map.Entry<ResourceKey<Biome>, Biome> entry : BuiltinRegistries.BIOME.entrySet()) {
+                    for (Map.Entry<ResourceKey<Biome>, Biome> entry : context.getSource().registryAccess().registry(Registries.BIOME).get().entrySet()) {
                         ResourceLocation id = entry.getKey().location();
                         System.out.println(id);
                     }

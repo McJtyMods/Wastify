@@ -3,12 +3,12 @@ package com.mcjty.wastify;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
@@ -24,7 +24,7 @@ public class WastifyBiomeSource extends BiomeSource {
     public static final Codec<WastifyBiomeSource> CODEC = RecordCodecBuilder.create(
             instance -> instance
                     .group(
-                            RegistryOps.retrieveRegistry(Registry.BIOME_REGISTRY).forGetter(provider -> provider.biomes),
+                            RegistryOps.retrieveRegistryLookup(Registries.BIOME).forGetter(provider -> provider.biomes),
                             Codec.STRING.fieldOf("dimension").forGetter(provider -> provider.dimensionId),
                             BiomeSource.CODEC.fieldOf("adapt_biome_source").forGetter(provider -> provider.biomeSource),
                             Codec.STRING.optionalFieldOf("default").forGetter(provider -> Optional.ofNullable(provider.mapper.getDefaultBiomeId())),
@@ -35,13 +35,13 @@ public class WastifyBiomeSource extends BiomeSource {
                     .apply(instance, instance.stable(WastifyBiomeSource::new)));
 
     private final String dimensionId;
-    private final Registry<Biome> biomes;
+    private final HolderLookup.RegistryLookup<Biome> biomes;
     private final BiomeSource biomeSource;
     private final BiomeMapper mapper;
     private final BiomeMapper sphereMapper;
     private Level level;    // Only needed for Lost Cities
 
-    public WastifyBiomeSource(Registry<Biome> biomes, String dimensionId, BiomeSource biomeSource,
+    public WastifyBiomeSource(HolderLookup.RegistryLookup<Biome> biomes, String dimensionId, BiomeSource biomeSource,
                               Optional<String> defaultBiome,
                               Optional<String> defaultSphereBiome,
                               List<String> biomeMappingList,
@@ -68,7 +68,7 @@ public class WastifyBiomeSource extends BiomeSource {
         if (LostCityCompat.hasLostCities()) {
             if (level == null) {
                 MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-                level = server.getLevel(ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(dimensionId)));
+                level = server.getLevel(ResourceKey.create(Registries.DIMENSION, new ResourceLocation(dimensionId)));
             }
             if (level != null && LostCityCompat.isInSphere(level, (x << 2) + 2, (z << 2) + 2)) {
                 m = sphereMapper;

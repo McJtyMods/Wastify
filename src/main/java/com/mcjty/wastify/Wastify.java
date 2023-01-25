@@ -5,6 +5,7 @@ import com.mojang.serialization.Codec;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -24,7 +25,7 @@ public class Wastify {
 
     public static final Logger LOGGER = LogManager.getLogger();
 
-    public static final DeferredRegister<Codec<? extends BiomeSource>> BIOMESOURCE_REGISTRY = DeferredRegister.create(Registry.BIOME_SOURCE_REGISTRY, MODID);
+    public static final DeferredRegister<Codec<? extends BiomeSource>> BIOMESOURCE_REGISTRY = DeferredRegister.create(Registries.BIOME_SOURCE, MODID);
     public static final RegistryObject<Codec<WastifyBiomeSource>> WASTIFY_BIOME_SOURCE = BIOMESOURCE_REGISTRY.register("wastify_biomes", () -> WastifyBiomeSource.CODEC);
 
     public Wastify() {
