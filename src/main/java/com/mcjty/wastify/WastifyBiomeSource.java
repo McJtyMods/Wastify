@@ -19,6 +19,7 @@ import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class WastifyBiomeSource extends BiomeSource {
     public static final Codec<WastifyBiomeSource> CODEC = RecordCodecBuilder.create(
@@ -46,7 +47,9 @@ public class WastifyBiomeSource extends BiomeSource {
                               Optional<String> defaultSphereBiome,
                               List<String> biomeMappingList,
                               Optional<List<String>> sphereBiomeMappingList) {
-        super(biomeSource.possibleBiomes().stream());
+        // @todo 1.19.4
+//        super(biomeSource.possibleBiomes().stream());
+        super();
         this.dimensionId = dimensionId;
         this.biomes = biomes;
         this.biomeSource = biomeSource;
@@ -58,6 +61,11 @@ public class WastifyBiomeSource extends BiomeSource {
     @Nonnull
     protected Codec<? extends BiomeSource> codec() {
         return CODEC;
+    }
+
+    @Override
+    protected Stream<Holder<Biome>> collectPossibleBiomes() {
+        return biomeSource.possibleBiomes().stream();   // @todo 1.19.4 is this correct?
     }
 
     @Override
