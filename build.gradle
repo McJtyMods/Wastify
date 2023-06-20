@@ -25,11 +25,6 @@ if (project.file('../gradletools.gradle').exists()) {
     apply from: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkspace/1.20_tech/gradletools.gradle'
 }
 
-repositories {
-    maven { url "https://dvs1.progwml6.com/files/maven" } // JEI
-    maven { url "https://maven.k-4u.nl" } // McJtyLib, TOP
-}
-
 group = "com.github.mcjty"
 archivesBaseName = "wastify"
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
@@ -45,6 +40,7 @@ sourceSets.main.resources {
     srcDir 'src/generated/resources'
 }
 
+repos()
 dependencies {
     mc()
     jei()
