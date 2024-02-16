@@ -26,7 +26,7 @@ public class Wastify {
     public static final Logger LOGGER = LogManager.getLogger();
 
     public static final DeferredRegister<Codec<? extends BiomeSource>> BIOMESOURCE_REGISTRY = DeferredRegister.create(Registries.BIOME_SOURCE, MODID);
-    public static final RegistryObject<Codec<WastifyBiomeSource>> WASTIFY_BIOME_SOURCE = BIOMESOURCE_REGISTRY.register("wastify_biomes", () -> WastifyBiomeSource.CODEC);
+    public static final Supplier<Codec<WastifyBiomeSource>> WASTIFY_BIOME_SOURCE = BIOMESOURCE_REGISTRY.register("wastify_biomes", () -> WastifyBiomeSource.CODEC);
 
     public Wastify() {
         Config.register();
